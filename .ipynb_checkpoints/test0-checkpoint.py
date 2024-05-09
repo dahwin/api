@@ -1,19 +1,13 @@
-#perfect
-
 import cv2
 import time
 import threading
-from PIL import Image
-import asyncio
-import nest_asyncio
 
-nest_asyncio.apply()
 time.sleep(1)
 
-# url =  "http://localhost:3000/video_feed"
 url =  "http://127.0.0.1:8000/video_feed"
-# url =  "https://video.queendahyun.com/video_feed"
-# url =  "https://name.queendahyun.com/video_feed"
+# url = "https://fight-quite-matched-congress.trycloudflare.com/video_feed"
+# url = "https://video.queendahyun.com/video_feed"
+
 # Initialize VideoCapture object
 cap = cv2.VideoCapture(url)
 
@@ -23,32 +17,31 @@ frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 # Define the codec and create VideoWriter object
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter('output0.avi', fourcc, 3.8, (frame_width, frame_height))
+out = cv2.VideoWriter('output00.avi', fourcc, 3.8, (frame_width, frame_height))
 
-async def read_frames_async():
+
+# Function to continuously read frames and write them to the output video
+def read_frames():
     start_time = time.time()
     frame_count = 0
-
-    all_count = 0
-    
     while frame_count < 100:
         ret, frame = cap.read()
-        out.write(frame)
-
-
         frame_count += 1
-        all_count +=1
+        out.write(frame)
 
     end_time = time.time()
     elapsed_time = end_time - start_time
     print("Time taken to get frames:", elapsed_time, "seconds")
     print("Frame count:", frame_count)
-    
 
+# Start reading frames in a separate thread
+frame_thread = threading.Thread(target=read_frames)
+frame_thread.start()
 
-# Start reading frames asynchronously
-asyncio.run(read_frames_async())
+# Wait for the frame thread to finish
+frame_thread.join()
 
 # Release everything when done
 cap.release()
+out.release()
 
