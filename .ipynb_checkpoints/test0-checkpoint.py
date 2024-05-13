@@ -27,6 +27,7 @@ def read_frames():
     while frame_count < 100:
         ret, frame = cap.read()
         frame_count += 1
+        print(frame_count)
         out.write(frame)
 
     end_time = time.time()
